@@ -21,18 +21,56 @@ on:
     #     - 'LICENSE'
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+    test:
+        runs-on: ubuntu-Latest
         steps:
-        - name: Output event data
-          run: echo "${{ toJson(github.event) }}"
         - name: Get code
           uses: actions/checkout@v3
         - name: Install dependencies
           run: npm ci
         - name: Test code
           run : npm run test
+    
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Get code
+          uses: actions/checkout@v3
+        - name: Install dependencies
+          run: npm ci
         - name: Build code
           run : npm run build
+        - name: Publish Js Files
+          id: publish
+          run: find dist/assets/*.js -type f -execdir echo 'script-file ={}' >> $GITHUB_OUTPUT
+        - name: Upload build Artifcats
+          uses: actions/upload-artifact@v4
+          with:
+            name: dist-files
+            path: dist
+
+
+    deploy:
+        runs-on: ubuntu-latest
+        # steps:
+        # - name: Output event data
+        #   run: echo "${{ toJson(github.event) }}"
+        # - name: Get code
+        #   uses: actions/checkout@v3
+        # - name: Install dependencies
+        #   run: npm ci
+        # - name: Test code
+        #   run : npm run test
+        # - name: Build code
+        #   run : npm run build
+        # - name: Deploy Project
+        #   run : echo 'deploying the project"'
+        steps:
+        - name: Download build Artifcats
+          uses: actions/download-artifact@v4
+          with:
+            name: dist-files
+        - name: Output content
+          run: ls -la
         - name: Deploy Project
-          run : echo 'deploying the project"'
+          run: echo "Deploying................."

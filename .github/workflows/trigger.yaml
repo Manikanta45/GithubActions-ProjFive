@@ -1,0 +1,38 @@
+name : event-trigger
+on:
+  workflow_dispatch:
+#   pull_request:
+#     branches:
+#         - main
+#     types:
+#         - opened
+#         - synchronize
+#         - reopened
+  push:
+    branches:
+        - main
+        # - 'dev-*'
+        # - 'featue-*'
+    # paths-ignore:
+    #     - 'README.md'
+    #     - 'CHANGELOG.md'
+    #     - 'CONTRIBUTING.md'
+    #     - 'CODE_OF_CONDUCT.md'
+    #     - 'LICENSE'
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Output event data
+          run: echo "${{ toJson(github.event) }}"
+        - name: Get code
+          uses: actions/checkout@v3
+        - name: Install dependencies
+          run: npm ci
+        - name: Test code
+          run : npm run test
+        - name: Build code
+          run : npm run build
+        - name: Deploy Project
+          run : echo 'deploying the project"'
